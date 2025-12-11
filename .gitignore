@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+embeddings
+.env
+src/main/resources/data
+
 ### STS ###
 .apt_generated
 .classpath
