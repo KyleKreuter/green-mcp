@@ -23,6 +23,21 @@ public interface BeschlussRepository extends JpaRepository<Beschluss, UUID> {
         @Param("limit") int limit
     );
 
+    @Query(value = """
+        SELECT * FROM beschluesse
+        WHERE filename ILIKE :filename
+        ORDER BY embedding <=> cast(:embedding as vector)
+        LIMIT :limit
+        """, nativeQuery = true)
+    List<Beschluss> findByFilenameAndEmbeddingSimilarity(
+        @Param("filename") String filename,
+        @Param("embedding") String embedding,
+        @Param("limit") int limit
+    );
+
+    @Query("SELECT DISTINCT b.filename FROM Beschluss b ORDER BY b.filename")
+    List<String> findAllFilenames();
+
     @Modifying
     @Query(value = """
         INSERT INTO beschluesse (id, pdf_url, chunk_index, content, title, topic, filename, word_count, embedding)

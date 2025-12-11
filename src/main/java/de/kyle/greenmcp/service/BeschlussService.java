@@ -21,6 +21,16 @@ public class BeschlussService {
         return beschlussRepository.findByEmbeddingSimilarity(vectorString, limit);
     }
 
+    public List<Beschluss> searchInBeschluss(String filename, String query, int limit) {
+        float[] queryEmbedding = embeddingService.embed(query);
+        String vectorString = embeddingService.toVectorString(queryEmbedding);
+        return beschlussRepository.findByFilenameAndEmbeddingSimilarity("%" + filename + "%", vectorString, limit);
+    }
+
+    public List<String> getAllFilenames() {
+        return beschlussRepository.findAllFilenames();
+    }
+
     public long count() {
         return beschlussRepository.count();
     }
