@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: green-mcp-db
+    environment:
+      POSTGRES_DB: greenmcp
+      POSTGRES_USER: greenmcp
+      POSTGRES_PASSWORD: greenmcp
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U greenmcp -d greenmcp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mcp-server:
+    build: .
+    container_name: green-mcp-server
+    ports:
+      - "2228:2228"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/greenmcp
+      SPRING_DATASOURCE_USERNAME: greenmcp
+      SPRING_DATASOURCE_PASSWORD: greenmcp
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
